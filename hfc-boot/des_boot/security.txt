@@ -1,0 +1,1 @@
+FMERGE(boot.bin.sign,ff,atk_csf.bin,0x0,null,0x10000,../u-boot.bin,0x20000)

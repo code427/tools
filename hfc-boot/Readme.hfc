@@ -1,0 +1,100 @@
+1. System Map
+
+	2M + 4M + 30M + 8M + () + 4M = 46M             256M(208M)
+
+	   0x0	---------------------  #########################################
+			| 					| 
+			| 	 SPL-stage 1	| <------64k(iboot)
+	 		|					|
+			---------------------
+			|  	  Reserv		| <------64k
+    0x20000	--------------------------------------------------------- 
+			|  	  				| 
+			|  	  				| 
+			|  	 	Uboot		| <------512K(uboot)
+			|  	 <Kernel Key>	| 
+			|  	  				| 
+    0xA0000	------------------------------------(640K)-----------  embed(2M)
+			|  	  				| 
+			|  	  Reserv		| <------768K
+			|  	  				| 
+   0x140000	---------------------
+			|  	  				| 
+			|  	  BBT Table		| <------768K(Nand Bad Block Table,6 Block)
+			|  	  				| 
+   0x200000	---------------------  ########################################
+			|  	  				| 
+			|  	  				| 
+			|  	 	Kernel		| <------4M(Raw)				/kernel(4M)
+			|  	  				| 
+			|  	  				| 
+   0x600000	---------------------  ########################################
+			|  	  				| 
+			|  	  				| 
+			|  	  Resource		| <------30M(ubifs rootfs)	  /SysData(30M)
+			|  	  				| 		{debug.ko,logo,key,font,libary,TestUnit,tools...}
+			|  	  				| 
+		  	---------------------  #########################################
+			|  	  				| 
+			|  	  Security		| <------8M(ubifs rw)			/secure(8M)
+			|  	  				| 
+			---------------------  #########################################
+			|  	  				| 
+			|  	  				| 
+			|  	   UserFs		| <------200M(ubifs rw)			/usrfs(208M)
+			|  	  				| 
+			|  	  				| 
+			---------------------  #########################################
+			|  	  				| 
+			|  	  				| 
+			|  	   Reserve		| <------4M(un-use-back_kernel)		Reserve(4M)
+			|  	  				| 
+			|  	  				| 
+			---------------------  #########################################
+
+3. Boot version(18byte):
+
+BDS100XAAD15B16110
+
+B - Boot (B - K - F)
+DS100 - product ID
+X - reserve
+A - H/W version (A~Z  0 - ERR) (adjust AD value)
+A - H/W (Recension - A-Z 0 - ERR) (means software support >= H/W version)
+D - Debug (D - R)
+14 - year
+7 - Month(0~C)
+01 - day
+001 - sw version (0.0.1)
+
+
+4. signature Struct
+    uint8_t     ih_issuer[IH_SIGN_ISSUER];      /* Image Signature Company .Ltd */
+    uint8_t     ih_sign_ver[IH_SIGN_VERSION];   /* Image Signature Version  */
+    uint8_t     ih_sign_algo[IH_SIGN_ALGO];     /* Image Signature Algo */
+    uint8_t     ih_sign_klen[IH_SIGN_KLEN];     /* Image Signature Key Size */
+    uint8_t     ih_sign_user[IH_SIGN_USER];     /* Image Signature Usage    */
+    uint8_t     ih_sign_model[IH_SIGN_MODEL];   /* Image Signature Model    */
+    uint8_t     ih_sign_txt[IH_SIGN_TXT];       /* Image Signature TXT  */
+    uint8_t     ih_sign_res[IH_SIGN_RES];       /* Image Signature RES  */
+
+5. SDRAM maps
+	KNL_ADDR		0x80800000
+
+	KNL_UNZIP_ADDR	0x80008000 /*kernel unzip address*/
+
+	ROOTFS_ADDR		0x81000000
+	
+	FDT_ADDR		0x81f10000
+	
+	FB_ADDR			0x82600000
+	GW_ADDR			0x82800000
+	BOOT_ADDR		0x83f00000
+
+6. create image for download
+
+1. cd des_boot
+2. ./atk_tool -F security.txt
+3. download boot.bin.sign
+
+
